@@ -1,232 +1,186 @@
 // Problem #3: Airplane seat assignment
-#include <iostream>   // needed for cout and cin
-using namespace std;  // allows direct use of cout and cin
 
-// Function prototypes
-// This function initializes the seat chart.
+#include <iostream>
+using namespace std;
+
+// function prototypes
 void initialize_seats(char seats[10][4]);
-
-// This function displays the current seat chart.
 void display_seats(char seats[10][4]);
-
-// This function converts seat letter to column index.
 int letter_to_column(char seat_letter);
-
-// This function checks if a seat input is valid.
 bool valid_seat(int row, char seat_letter);
-
-// This function checks if a seat is available.
 bool seat_available(char seats[10][4], int row, char seat_letter);
-
-// This function reserves a seat by marking it with 'X'.
 void reserve_seat(char seats[10][4], int row, char seat_letter);
-
-// This function checks whether all seats are taken.
 bool all_taken(char seats[10][4]);
 
 int main()
 {
-    // 2D array for 10 rows and 4 seats per row
-    char seats[10][4];
+	char seats[10][4];   // 10 rows and 4 seats per row
+	int row;             // user input for row
+	char seat_letter;    // user input for seat letter
+	char response;       // to continue or stop
 
-    // Variables for user seat choice
-    int row;
-    char seat_letter;
+	// initialize all seats as A, B, C, D
+	initialize_seats(seats);
 
-    // Variable to repeat process
-    char response;
+	// mark example taken seats from homework prompt
+	reserve_seat(seats, 1, 'B');
+	reserve_seat(seats, 3, 'D');
+	reserve_seat(seats, 5, 'A');
 
-    // Initialize seat chart
-    initialize_seats(seats);
+	do
+	{
+		// show current seat chart
+		display_seats(seats);
 
-    // Example taken seats from homework prompt
-    reserve_seat(seats, 1, 'B');
-    reserve_seat(seats, 3, 'D');
-    reserve_seat(seats, 5, 'A');
+		// stop if all seats are already taken
+		if (all_taken(seats))
+		{
+			cout << "All seats are taken." << endl;
+			break;
+		}
 
-    do
-    {
-        // Display current seat arrangement
-        display_seats(seats);
+		// keep asking until user enters a valid and available seat
+		do
+		{
+			cout << "Enter desired row number (1 to 10): ";
+			cin >> row;
 
-        // If all seats are taken, stop
-        if (all_taken(seats))
-        {
-            cout << "All seats are taken." << endl;
-            break;
-        }
+			cout << "Enter desired seat letter (A to D): ";
+			cin >> seat_letter;
 
-        // Ask user for seat until valid and available seat is chosen
-        do
-        {
-            // Get row number
-            cout << "Enter desired row number (1 to 10): ";
-            cin >> row;
+			// convert lowercase to uppercase
+			if (seat_letter >= 'a' && seat_letter <= 'd')
+			{
+				seat_letter = seat_letter - 32;
+			}
 
-            // Get seat letter
-            cout << "Enter desired seat letter (A to D): ";
-            cin >> seat_letter;
+			// check whether row and seat letter are valid
+			if (!valid_seat(row, seat_letter))
+			{
+				cout << "Invalid seat selection. Try again." << endl;
+			}
+			// check whether seat is already taken
+			else if (!seat_available(seats, row, seat_letter))
+			{
+				cout << "Seat is already taken. Try again." << endl;
+			}
+			else
+			{
+				// reserve seat if valid and available
+				reserve_seat(seats, row, seat_letter);
+				cout << "Seat reserved successfully." << endl;
+				break;
+			}
 
-            // Convert lowercase to uppercase if needed
-            if (seat_letter >= 'a' && seat_letter <= 'd')
-            {
-                seat_letter = seat_letter - 32;
-            }
+		} while (true);
 
-            // Check if seat input is valid
-            if (!valid_seat(row, seat_letter))
-            {
-                cout << "Invalid seat selection. Try again." << endl;
-            }
-            // Check if seat is already taken
-            else if (!seat_available(seats, row, seat_letter))
-            {
-                cout << "Seat is already taken. Try again." << endl;
-            }
-            else
-            {
-                // Valid and available seat found, reserve it
-                reserve_seat(seats, row, seat_letter);
-                cout << "Seat reserved successfully." << endl;
-                break;
-            }
+		// ask if user wants another reservation
+		cout << "Do you want to reserve another seat? (Y/N): ";
+		cin >> response;
 
-        } while (true);
+	} while (response == 'Y' || response == 'y');
 
-        // Ask user if they want to reserve another seat
-        cout << "Do you want to reserve another seat? (Y/N): ";
-        cin >> response;
-
-    } while (response == 'Y' || response == 'y');
-
-    return 0;
+	return 0;
 }
 
-// Function definition to initialize all seats
+// initialize all seats in each row
 void initialize_seats(char seats[10][4])
 {
-    // Loop through each row
-    for (int i = 0; i < 10; i++)
-    {
-        // Set the 4 seat letters in each row
-        seats[i][0] = 'A';
-        seats[i][1] = 'B';
-        seats[i][2] = 'C';
-        seats[i][3] = 'D';
-    }
+	for (int i = 0; i < 10; i++)
+	{
+		seats[i][0] = 'A';
+		seats[i][1] = 'B';
+		seats[i][2] = 'C';
+		seats[i][3] = 'D';
+	}
 }
 
-// Function definition to display seat chart
+// display current seat chart
 void display_seats(char seats[10][4])
 {
-    cout << endl;
-    cout << "Current Seat Chart:" << endl;
+	cout << endl;
+	cout << "Current Seat Chart:" << endl;
 
-    // Loop through rows
-    for (int i = 0; i < 10; i++)
-    {
-        // Display row number
-        cout << i + 1 << " ";
+	for (int i = 0; i < 10; i++)
+	{
+		cout << i + 1 << " ";
 
-        // Loop through seat columns
-        for (int j = 0; j < 4; j++)
-        {
-            // Display seat character
-            cout << seats[i][j] << " ";
-        }
+		for (int j = 0; j < 4; j++)
+		{
+			cout << seats[i][j] << " ";
+		}
 
-        cout << endl;
-    }
+		cout << endl;
+	}
 
-    cout << endl;
+	cout << endl;
 }
 
-// Function definition to convert seat letter to column number
+// convert seat letter into column index
 int letter_to_column(char seat_letter)
 {
-    if (seat_letter == 'A')
-    {
-        return 0;
-    }
-    else if (seat_letter == 'B')
-    {
-        return 1;
-    }
-    else if (seat_letter == 'C')
-    {
-        return 2;
-    }
-    else if (seat_letter == 'D')
-    {
-        return 3;
-    }
-    else
-    {
-        return -1;
-    }
+	if (seat_letter == 'A')
+		return 0;
+	else if (seat_letter == 'B')
+		return 1;
+	else if (seat_letter == 'C')
+		return 2;
+	else if (seat_letter == 'D')
+		return 3;
+	else
+		return -1;
 }
 
-// Function definition to validate seat input
+// check whether seat input is within valid range
 bool valid_seat(int row, char seat_letter)
 {
-    // Check row range
-    if (row < 1 || row > 10)
-    {
-        return false;
-    }
+	if (row < 1 || row > 10)
+	{
+		return false;
+	}
 
-    // Check seat letter
-    if (seat_letter != 'A' && seat_letter != 'B' &&
-        seat_letter != 'C' && seat_letter != 'D')
-    {
-        return false;
-    }
+	if (seat_letter != 'A' && seat_letter != 'B' &&
+		seat_letter != 'C' && seat_letter != 'D')
+	{
+		return false;
+	}
 
-    return true;
+	return true;
 }
 
-// Function definition to check if seat is available
+// check whether selected seat is free
 bool seat_available(char seats[10][4], int row, char seat_letter)
 {
-    // Convert seat letter to column index
-    int col = letter_to_column(seat_letter);
+	int col = letter_to_column(seat_letter);
 
-    // Row number entered by user is 1 to 10
-    // Array index is 0 to 9, so use row - 1
-    if (seats[row - 1][col] == 'X')
-    {
-        return false;
-    }
+	if (seats[row - 1][col] == 'X')
+	{
+		return false;
+	}
 
-    return true;
+	return true;
 }
 
-// Function definition to reserve seat
+// mark selected seat as taken
 void reserve_seat(char seats[10][4], int row, char seat_letter)
 {
-    // Convert seat letter to column index
-    int col = letter_to_column(seat_letter);
-
-    // Mark seat as taken
-    seats[row - 1][col] = 'X';
+	int col = letter_to_column(seat_letter);
+	seats[row - 1][col] = 'X';
 }
 
-// Function definition to check if all seats are taken
+// check whether all seats are taken
 bool all_taken(char seats[10][4])
 {
-    // Check every seat in the 2D array
-    for (int i = 0; i < 10; i++)
-    {
-        for (int j = 0; j < 4; j++)
-        {
-            // If any seat is not X, at least one seat is free
-            if (seats[i][j] != 'X')
-            {
-                return false;
-            }
-        }
-    }
+	for (int i = 0; i < 10; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			if (seats[i][j] != 'X')
+			{
+				return false;
+			}
+		}
+	}
 
-    // If loop finishes, every seat is X
-    return true;
+	return true;
 }
